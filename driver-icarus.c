@@ -289,10 +289,11 @@ static int icarus_gets(unsigned char *buf, int fd, struct timeval *tv_finish, st
 
 		if (ret >= read_amount) {
 			if (!opt_quiet) {
-				printf("[1;31m <<< BTC:[0m ");
+				char buff[ICARUS_READ_SIZE * 2 + 1];
 				for(i=0; i<ICARUS_READ_SIZE; i++)
-					printf("%02x", *hbuf++);
-				printf("\n");
+					sprintf(buff + 2*i, "%02x", *hbuf++);
+				buff[2*i]=0;
+				applog(LOG_DEBUG, "<<< BTC: %s", buff);
 			}
 			return ICA_GETS_OK;
 		}
@@ -333,10 +334,11 @@ static int icarus_write(int fd, const void *buf, size_t bufLen)
 
 	if (!opt_quiet) {
 		p = (unsigned char *)buf;
-		printf("[1;33m >>> BTC:[0m ");
+		char buff[bufLen * 2 + 1];
 		for(i=0; i<bufLen; i++)
-			printf("%02x", *p++);
-		printf("\n");
+			sprintf(buff + 2*i, "%02x", *p++);
+		buff[2*i]=0;
+		applog(LOG_DEBUG, ">>> BTC: %s", buff);
 	}
 	ret = write(fd, buf, bufLen);
 	if (unlikely(ret != bufLen))
